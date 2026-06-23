@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - KCYM Pulluvazhy{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card-premium p-4 shadow-lg border-0">
+                <div class="text-center mb-4">
+                    <h3 class="fw-bold text-primary-dark">KCYM Registration Request</h3>
+                    <p class="text-muted">Register as a member of KCYM St. Thomas Church, Pulluvazhy. Requests are reviewed by the Executive Committee.</p>
+                </div>
+
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger shadow-sm border-0 rounded-3">
+                            {% for error in form.non_field_errors %}
+                                <p class="mb-0">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="row">
+                        <!-- Personal Info -->
+                        <div class="col-md-6 form-group-premium mb-3">
+                            <label for="{{ form.first_name.id_for_label }}">First Name</label>
+                            <input type="text" name="first_name" class="form-control rounded-3 {% if form.first_name.errors %}is-invalid{% endif %}" required id="id_first_name" value="{{ form.first_name.value|default_if_none:'' }}">
+                            {% for error in form.first_name.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6 form-group-premium mb-3">
+                            <label for="{{ form.last_name.id_for_label }}">Last Name</label>
+                            <input type="text" name="last_name" class="form-control rounded-3 {% if form.last_name.errors %}is-invalid{% endif %}" required id="id_last_name" value="{{ form.last_name.value|default_if_none:'' }}">
+                            {% for error in form.last_name.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Auth Info -->
+                        <div class="col-md-6 form-group-premium mb-3">
+                            <label for="{{ form.username.id_for_label }}">Username</label>
+                            <input type="text" name="username" class="form-control rounded-3 {% if form.username.errors %}is-invalid{% endif %}" required id="id_username" value="{{ form.username.value|default_if_none:'' }}" placeholder="Choose a username">
+                            {% for error in form.username.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6 form-group-premium mb-3">
+                            <label for="{{ form.email.id_for_label }}">Email Address</label>
+                            <input type="email" name="email" class="form-control rounded-3 {% if form.email.errors %}is-invalid{% endif %}" required id="id_email" value="{{ form.email.value|default_if_none:'' }}">
+                            {% for error in form.email.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Validation Fields -->
+                        <div class="col-md-6 form-group-premium mb-3">
+                            <label for="{{ form.phone_number.id_for_label }}">Phone Number</label>
+                            <input type="text" name="phone_number" class="form-control rounded-3 {% if form.phone_number.errors %}is-invalid{% endif %}" required id="id_phone_number" value="{{ form.phone_number.value|default_if_none:'' }}" placeholder="10 or 12 digit number">
+                            {% for error in form.phone_number.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6 form-group-premium mb-3">
+                            <label for="{{ form.date_of_birth.id_for_label }}">Date of Birth</label>
+                            <input type="date" name="date_of_birth" class="form-control rounded-3 {% if form.date_of_birth.errors %}is-invalid{% endif %}" required id="id_date_of_birth" value="{{ form.date_of_birth.value|default_if_none:'' }}">
+                            {% for error in form.date_of_birth.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                            <small class="form-text text-muted" style="font-size: 0.75rem;">Must be 18 years or older.</small>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group-premium mb-3">
+                            <label for="{{ form.gender.id_for_label }}">Gender</label>
+                            {{ form.gender }}
+                            {% for error in form.gender.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6 form-group-premium mb-3">
+                            <label for="{{ form.blood_group.id_for_label }}">Blood Group</label>
+                            {{ form.blood_group }}
+                            {% for error in form.blood_group.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group-premium mb-3">
+                            <label for="{{ form.password1.id_for_label }}">Password</label>
+                            <input type="password" name="password1" class="form-control rounded-3 {% if form.password1.errors %}is-invalid{% endif %}" required id="id_password_1">
+                            {% for error in form.password1.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6 form-group-premium mb-3">
+                            <label for="{{ form.password2.id_for_label }}">Confirm Password</label>
+                            <input type="password" name="password2" class="form-control rounded-3 {% if form.password2.errors %}is-invalid{% endif %}" required id="id_password_2">
+                            {% for error in form.password2.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary-custom w-100 py-2.5 rounded-3 fw-bold mt-3">
+                        Submit Registration Request
+                    </button>
+                </form>
+
+                <div class="text-center mt-3 pt-3 border-top">
+                    <p class="mb-0 text-muted">Already have an account? <a href="{% url 'login' %}" class="text-primary fw-semibold">Login here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

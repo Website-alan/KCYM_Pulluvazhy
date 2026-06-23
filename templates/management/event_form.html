@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if object %}Edit Event{% else %}Schedule New Event{% endif %} - KCYM Pulluvazhy{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card-premium p-4 shadow-sm">
+                <h3 class="fw-bold mb-1 text-primary-dark">
+                    <i class="bi bi-calendar-event text-primary"></i> 
+                    {% if object %}Edit Event: {{ object.title }}{% else %}Schedule New Event{% endif %}
+                </h3>
+                <p class="text-muted mb-4">Post upcoming church assemblies, youth meetings, or public services.</p>
+                
+                <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                <p class="mb-0">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="form-group-premium mb-3">
+                        <label for="{{ form.title.id_for_label }}">Event Title</label>
+                        {{ form.title }}
+                        {% for error in form.title.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="form-group-premium mb-3">
+                        <label for="{{ form.description.id_for_label }}">Event Description</label>
+                        {{ form.description }}
+                        {% for error in form.description.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group-premium mb-3">
+                            <label for="{{ form.date_and_time.id_for_label }}">Date & Time</label>
+                            {{ form.date_and_time }}
+                            {% for error in form.date_and_time.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6 form-group-premium mb-3">
+                            <label for="{{ form.location.id_for_label }}">Location</label>
+                            {{ form.location }}
+                            {% for error in form.location.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="row align-items-center g-3 mb-3">
+                        <div class="col-md-6 form-group-premium">
+                            <label for="{{ form.coordinator.id_for_label }}">Event Coordinator (Member)</label>
+                            {{ form.coordinator }}
+                            {% for error in form.coordinator.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="col-md-6 d-flex flex-column justify-content-center">
+                            <div class="form-check form-switch mt-3">
+                                {{ form.is_public }}
+                                <label class="form-check-label fw-semibold" for="{{ form.is_public.id_for_label }}">
+                                    Make Event Public (Visible to non-members)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group-premium mb-4">
+                        <label for="{{ form.poster.id_for_label }}">Event Poster (Optional)</label>
+                        {{ form.poster }}
+                        {% for error in form.poster.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                        <small class="text-muted" style="font-size: 0.75rem;">Upload a poster/image to represent the event visually on the timeline.</small>
+                    </div>
+
+                    <div class="d-flex gap-3">
+                        <button type="submit" class="btn btn-primary-custom px-4 py-2.5 fw-bold flex-grow-1">
+                            {% if object %}Save Event Modifications{% else %}Publish Event{% endif %}
+                        </button>
+                        <a href="{% url 'event_timeline' %}" class="btn btn-outline-secondary px-4 py-2.5 fw-bold">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

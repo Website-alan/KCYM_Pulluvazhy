@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+
+{% block title %}Executive Dashboard - KCYM Pulluvazhy{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-5 border-bottom pb-3">
+        <div>
+            <h1 class="fw-bold mb-1">Executive Dashboard</h1>
+            <p class="text-muted mb-0">Manage KCYM members, approvals, events, and database actions.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'member_add' %}" class="btn btn-primary-custom btn-sm d-flex align-items-center gap-1">
+                <i class="bi bi-person-plus-fill"></i> Add Member
+            </a>
+            <a href="{% url 'event_add' %}" class="btn btn-secondary-custom btn-sm d-flex align-items-center gap-1">
+                <i class="bi bi-calendar-plus-fill"></i> Schedule Event
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-blue">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ total_members }}</div>
+                    <div class="stat-label">Approved Members</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-gold">
+                    <i class="bi bi-droplet-fill"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ active_donors }}</div>
+                    <div class="stat-label">Active Donors</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-red">
+                    <i class="bi bi-person-exclamation"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ pending_approvals.count }}</div>
+                    <div class="stat-label">Pending Requests</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-green">
+                    <i class="bi bi-calendar-event"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ upcoming_events_count }}</div>
+                    <div class="stat-label">Upcoming Events</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-5">
+        
+        <!-- Left Side: Registration Approvals -->
+        <div class="col-lg-8">
+            <div class="card-premium p-4 h-100">
+                <h4 class="fw-bold mb-4"><i class="bi bi-person-check-fill text-primary"></i> Pending Registration Requests</h4>
+                
+                {% if pending_approvals %}
+                    <div class="table-responsive table-responsive-custom">
+                        <table class="table table-custom align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Blood Group</th>
+                                    <th>Age</th>
+                                    <th>Phone Number</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for req in pending_approvals %}
+                                    <tr>
+                                        <td>
+                                            <div class="fw-bold text-primary-dark">{{ req.first_name }} {{ req.last_name }}</div>
+                                            <small class="text-muted">{{ req.email }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-danger px-2.5 py-1.5 fw-bold" style="font-size: 0.8rem;">{{ req.blood_group }}</span>
+                                        </td>
+                                        <td>
+                                            <!-- Simple Age Calculation (DOB is guaranteed due to validation) -->
+                                            {{ req.date_of_birth|timesince|truncatewords:1 }} old
+                                        </td>
+                                        <td>{{ req.phone_number }}</td>
+                                        <td class="text-end">
+                                            <div class="d-flex justify-content-end gap-2">
+                                                <form method="post" action="{% url 'approve_member' req.pk %}">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-success btn-sm d-flex align-items-center gap-1 rounded-3">
+                                                        <i class="bi bi-check-lg"></i> Approve
+                                                    </button>
+                                                </form>
+                                                <form method="post" action="{% url 'reject_member' req.pk %}" onsubmit="return confirm('Are you sure you want to reject this request?');">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1 rounded-3">
+                                                        <i class="bi bi-x-lg"></i> Reject
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5 text-muted">
+                        <i class="bi bi-check-circle display-4 text-success mb-3"></i>
+                        <h5 class="fw-bold">All caught up!</h5>
+                        <p class="mb-0">There are no pending registration requests at the moment.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Right Side: Blood Donor breakdown -->
+        <div class="col-lg-4">
+            <div class="card-premium p-4 h-100">
+                <h4 class="fw-bold mb-4"><i class="bi bi-activity text-warning"></i> Blood Donors Registry Summary</h4>
+                <p class="text-muted small">Summary of registered members grouped by blood groups (active & inactive).</p>
+                
+                <div class="d-flex flex-column gap-3 mt-4">
+                    {% for bg, count in blood_breakdown.items %}
+                        <div class="d-flex justify-content-between align-items-center p-2.5 rounded-3" style="background-color: rgba(18, 60, 105, 0.03);">
+                            <span class="badge bg-danger fs-6 px-3 py-2 fw-bold" style="min-width: 50px;">{{ bg }}</span>
+                            <span class="fs-5 fw-bold text-primary-dark">{{ count }} donor{{ count|pluralize }}</span>
+                        </div>
+                    {% empty %}
+                        <div class="text-center text-muted py-4">
+                            <p class="mb-0">No donor statistics available.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="mt-4 pt-4 border-top">
+                    <a href="{% url 'blood_search' %}" class="btn btn-outline-primary btn-sm w-100 py-2 rounded-3 fw-semibold">
+                        <i class="bi bi-search"></i> Open Blood Donors Directory
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if object %}Edit Announcement{% else %}Post Announcement{% endif %} - KCYM Pulluvazhy{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card-premium p-4 shadow-sm">
+                <h3 class="fw-bold mb-1 text-primary-dark">
+                    <i class="bi bi-megaphone-fill text-primary"></i> 
+                    {% if object %}Edit Announcement: {{ object.title }}{% else %}Post New Announcement{% endif %}
+                </h3>
+                <p class="text-muted mb-4">Post updates, meeting notices, or prayer request details for the church youth.</p>
+                
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                <p class="mb-0">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="form-group-premium mb-3">
+                        <label for="{{ form.title.id_for_label }}">Announcement Title</label>
+                        {{ form.title }}
+                        {% for error in form.title.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="form-group-premium mb-3">
+                        <label for="{{ form.content.id_for_label }}">Content</label>
+                        {{ form.content }}
+                        {% for error in form.content.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="form-check form-switch mb-4">
+                        {{ form.is_pinned }}
+                        <label class="form-check-label fw-semibold" for="{{ form.is_pinned.id_for_label }}">
+                            Pin this announcement to the top of the feed
+                        </label>
+                    </div>
+
+                    <div class="d-flex gap-3">
+                        <button type="submit" class="btn btn-primary-custom px-4 py-2.5 fw-bold flex-grow-1">
+                            {% if object %}Save Notice{% else %}Publish Notice{% endif %}
+                        </button>
+                        <a href="{% url 'home' %}" class="btn btn-outline-secondary px-4 py-2.5 fw-bold">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

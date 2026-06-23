@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - KCYM Pulluvazhy{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card-premium p-4 shadow-lg border-0 my-5">
+                <div class="text-center mb-4">
+                    <h3 class="fw-bold text-primary-dark">Member Login</h3>
+                    <p class="text-muted">Enter your credentials to access the portal</p>
+                </div>
+                
+                <form method="post" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            Invalid username or password. Please try again.
+                        </div>
+                    {% endif %}
+
+                    <div class="form-group-premium mb-3">
+                        <label for="id_username"><i class="bi bi-person-fill"></i> Username</label>
+                        <input type="text" name="username" autofocus maxlength="150" class="form-control rounded-3" required id="id_username" placeholder="Enter username">
+                    </div>
+
+                    <div class="form-group-premium mb-4">
+                        <label for="id_password"><i class="bi bi-lock-fill"></i> Password</label>
+                        <input type="password" name="password" class="form-control rounded-3" required id="id_password" placeholder="Enter password">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary-custom w-100 py-2.5 rounded-3 fw-bold mb-3">
+                        Log In
+                    </button>
+                </form>
+
+                <div class="text-center mt-3 pt-3 border-top">
+                    <p class="mb-0 text-muted">Don't have an account? <a href="{% url 'register' %}" class="text-primary fw-semibold">Join KCYM Pulluvazhy</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

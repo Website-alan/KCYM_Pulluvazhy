@@ -1,0 +1,286 @@
+{% extends 'base.html' %}
+
+{% block title %}History Hub - KCYM Pulluvazhy{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+
+    <!-- Header Banner -->
+    <div class="card-premium p-4 border-0 mb-5 bg-gradient text-white position-relative overflow-hidden" 
+         style="background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%); border-radius: 24px;">
+        <div class="position-relative z-3">
+            <h1 class="fw-bold mb-2 text-info"><i class="bi bi-clock-history text-warning"></i> KCYM History Hub</h1>
+            <p class="mb-0 text-success" style="max-width: 600px;">
+                Looking back at our milestones, elected leaders, past events, and completed emergency blood arrangements that define KCYM Pulluvazhy.
+            </p>
+        </div>
+        <div class="position-absolute end-0 bottom-0 opacity-10 d-none d-lg-block" style="font-size: 8rem; transform: translate(20px, 30px);">
+            <i class="bi bi-clock-history"></i>
+        </div>
+    </div>
+
+    <!-- Quick Stats Cards -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="stat-card p-3 d-flex align-items-center gap-3">
+                <div class="stat-icon stat-icon-gold">
+                    <i class="bi bi-award-fill"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ committees|length }}</div>
+                    <div class="stat-label">Seeded Committees</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card p-3 d-flex align-items-center gap-3">
+                <div class="stat-icon stat-icon-blue">
+                    <i class="bi bi-calendar-check-fill"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ past_events|length }}</div>
+                    <div class="stat-label">Completed Events</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card p-3 d-flex align-items-center gap-3">
+                <div class="stat-icon stat-icon-red">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ arranged_blood|length }}</div>
+                    <div class="stat-label">Arranged Blood Requests</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Navigation Tabs -->
+    <ul class="nav nav-pills nav-fill justify-content-center p-2 bg-white rounded-4 shadow-sm mb-5 border gap-2" id="historyTab" role="tablist" style="max-width: 800px; margin: 0 auto;">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active rounded-3 py-3 fw-bold d-flex align-items-center justify-content-center gap-2" id="committees-tab" data-bs-toggle="tab" data-bs-target="#committees" type="button" role="tab" aria-controls="committees" aria-selected="true">
+                <i class="bi bi-people-fill"></i> Committees History
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link rounded-3 py-3 fw-bold d-flex align-items-center justify-content-center gap-2" id="events-tab" data-bs-toggle="tab" data-bs-target="#events" type="button" role="tab" aria-controls="events" aria-selected="false">
+                <i class="bi bi-calendar2-check-fill"></i> Completed Events
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link rounded-3 py-3 fw-bold d-flex align-items-center justify-content-center gap-2" id="blood-tab" data-bs-toggle="tab" data-bs-target="#blood" type="button" role="tab" aria-controls="blood" aria-selected="false">
+                <i class="bi bi-droplet-fill"></i> Arranged Blood Requests
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Contents -->
+    <div class="tab-content mt-4" id="historyTabContent">
+
+        <!-- 1. COMMITTEES TAB -->
+        <div class="tab-pane fade show active" id="committees" role="tabpanel" aria-labelledby="committees-tab">
+            <div class="d-flex flex-column gap-5">
+                {% if committees %}
+                    {% for committee in committees %}
+                        <div class="card-premium p-4 border-0 position-relative {% if committee.is_active %}border-start border-primary border-4{% endif %}">
+                            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                                <div class="d-flex align-items-center gap-3">
+                                    <h4 class="fw-bold mb-0 text-primary-dark">{{ committee.name }}</h4>
+                                    {% if committee.is_active %}
+                                        <span class="badge bg-success badge-custom"><i class="bi bi-patch-check-fill"></i> Active</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary badge-custom">Past Term</span>
+                                    {% endif %}
+                                </div>
+                                <div class="text-muted fw-bold small">
+                                    <i class="bi bi-calendar-range"></i> Years: {{ committee.start_year }} - {{ committee.end_year }}
+                                </div>
+                            </div>
+
+                            {% if committee.members.all %}
+                                <div class="row g-4">
+                                    {% for cm in committee.members.all %}
+                                        <div class="col-md-6 col-lg-4">
+                                            <div class="d-flex align-items-center p-3 rounded-4 border bg-light h-100 transition-all hover-translate">
+                                                <div class="profile-circle me-3 flex-shrink-0" style="width: 55px; height: 55px; font-size: 1.1rem; border-width: 2px;">
+                                                    {% if cm.member.profile_image %}
+                                                        <img src="{{ cm.member.profile_image.url }}" alt="{{ cm.member.first_name }} {{ cm.member.last_name }}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                                                    {% else %}
+                                                        {{ cm.member.first_name|slice:":1" }}{{ cm.member.last_name|slice:":1" }}
+                                                    {% endif %}
+                                                </div>
+                                                <div class="overflow-hidden">
+                                                    <h6 class="fw-bold mb-1 text-truncate text-primary-dark" style="font-size: 0.95rem;">{{ cm.member.first_name }} {{ cm.member.last_name }}</h6>
+                                                    <div class="mb-1">
+                                                        {% if cm.position == 'PRESIDENT' %}
+                                                            <span class="badge bg-warning text-dark" style="font-size: 0.7rem;">{{ cm.get_position_display }}</span>
+                                                        {% elif cm.position == 'SECRETARY' %}
+                                                            <span class="badge bg-primary text-white" style="font-size: 0.7rem;">{{ cm.get_position_display }}</span>
+                                                        {% elif cm.position == 'TREASURER' %}
+                                                            <span class="badge bg-info text-white" style="font-size: 0.7rem;">{{ cm.get_position_display }}</span>
+                                                        {% elif cm.position == 'VICE_PRESIDENT' or cm.position == 'JOINT_SECRETARY' %}
+                                                            <span class="badge bg-dark text-white" style="font-size: 0.7rem;">{{ cm.get_position_display }}</span>
+                                                        {% else %}
+                                                            <span class="badge bg-secondary text-white" style="font-size: 0.7rem;">{{ cm.get_position_display }}</span>
+                                                        {% endif %}
+                                                    </div>
+                                                    <small class="text-muted d-block text-truncate" style="font-size: 0.75rem;">Joined: {{ cm.joined_at|date:"M d, Y" }}</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="py-4 text-center text-muted">
+                                    <i class="bi bi-people-fill display-6 mb-2"></i>
+                                    <p class="mb-0">No committee members have been registered/assigned for this term yet.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="card-premium p-5 text-center text-muted border-0">
+                        <i class="bi bi-award display-5 mb-3 text-warning"></i>
+                        <h4 class="fw-bold text-primary-dark">No Committees Seeded</h4>
+                        <p class="mb-0">Please visit the Django Admin panel to register committees.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 2. COMPLETED EVENTS TAB -->
+        <div class="tab-pane fade" id="events" role="tabpanel" aria-labelledby="events-tab">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    {% if past_events %}
+                        <div class="timeline">
+                            {% for event in past_events %}
+                                <div class="timeline-item">
+                                    <div class="timeline-badge bg-secondary"></div>
+                                    <div class="timeline-card">
+                                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start mb-3 gap-2">
+                                            <div>
+                                                <h4 class="fw-bold text-primary-dark mb-1">{{ event.title }}</h4>
+                                                <div class="text-muted small fw-semibold">
+                                                    <i class="bi bi-calendar-check-fill me-1"></i> Completed on {{ event.date_and_time|date:"F d, Y @ g:i A" }}
+                                                </div>
+                                            </div>
+                                            <div>
+                                                {% if event.is_public %}
+                                                    <span class="badge bg-success badge-custom"><i class="bi bi-globe"></i> Public</span>
+                                                {% else %}
+                                                    <span class="badge bg-primary badge-custom"><i class="bi bi-shield-lock-fill"></i> Members Only</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                        {% if event.poster %}
+                                            <div class="mb-3 text-center bg-light p-2 rounded-3 border">
+                                                <img src="{{ event.poster.url }}" class="img-fluid rounded shadow-sm" alt="{{ event.title }} Poster" style="max-height: 300px; object-fit: contain;">
+                                            </div>
+                                        {% endif %}
+
+                                        <p class="text-muted" style="white-space: pre-line;">{{ event.description }}</p>
+
+                                        <div class="mt-3 pt-3 border-top d-flex flex-wrap justify-content-between text-muted small gap-3">
+                                            <div>
+                                                <i class="bi bi-geo-alt-fill text-warning me-1"></i> <strong>Location:</strong> {{ event.location }}
+                                            </div>
+                                            {% if event.coordinator %}
+                                                <div>
+                                                    <i class="bi bi-person-fill text-primary me-1"></i> <strong>Coordinator:</strong> {{ event.coordinator.first_name }} {{ event.coordinator.last_name }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="card-premium p-5 text-center text-muted border-0">
+                            <i class="bi bi-calendar-x display-5 mb-3"></i>
+                            <h4 class="fw-bold text-primary-dark">No Completed Events</h4>
+                            <p class="mb-0">There are no completed events stored in our records yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. ARRANGED BLOOD TAB -->
+        <div class="tab-pane fade" id="blood" role="tabpanel" aria-labelledby="blood-tab">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    {% if arranged_blood %}
+                        <div class="d-flex flex-column gap-4">
+                            {% for req in arranged_blood %}
+                                <div class="card-premium p-4 border-0 position-relative" style="border-left: 4px solid var(--success-color) !important;">
+                                    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="badge bg-danger fs-6 px-3 py-2 fw-bold" style="min-width: 60px;">{{ req.blood_group }}</span>
+                                            <h5 class="fw-bold mb-0 text-primary-dark ms-2">Request for {{ req.patient_name }}</h5>
+                                        </div>
+                                        <span class="badge bg-success badge-custom"><i class="bi bi-check-circle-fill"></i> Arranged / Fulfilled</span>
+                                    </div>
+
+                                    <div class="row g-3 text-muted small mt-2">
+                                        <div class="col-md-4">
+                                            <i class="bi bi-hospital text-danger me-1"></i> <strong>Hospital:</strong> {{ req.hospital }}
+                                        </div>
+                                        <div class="col-md-4">
+                                            <i class="bi bi-calendar-check me-1"></i> <strong>Needed Date:</strong> {{ req.needed_by|date:"M d, Y" }}
+                                        </div>
+                                        <div class="col-md-4">
+                                            <i class="bi bi-telephone me-1"></i> <strong>Contact:</strong> {{ req.contact_number }}
+                                        </div>
+                                    </div>
+
+                                    {% if req.details %}
+                                        <div class="mt-3 p-3 bg-light rounded-3 border-start border-secondary border-3 text-muted">
+                                            <strong class="text-primary-dark d-block mb-1">Details:</strong>
+                                            {{ req.details }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="card-premium p-5 text-center text-muted border-0">
+                            <i class="bi bi-droplet display-5 mb-3 text-danger"></i>
+                            <h4 class="fw-bold text-primary-dark">No Arranged Requests History</h4>
+                            <p class="mb-0">No completed emergency blood request histories are currently stored.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Custom Page Styles & Animations -->
+<style>
+    .hover-translate:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        border-color: var(--primary-light) !important;
+    }
+    .nav-pills .nav-link {
+        color: var(--primary-color);
+        background-color: transparent;
+        transition: var(--transition-smooth);
+        border: 1px solid transparent;
+    }
+    .nav-pills .nav-link:hover {
+        color: var(--primary-light);
+        background-color: rgba(18, 60, 105, 0.05);
+    }
+    .nav-pills .nav-link.active {
+        background-color: var(--primary-color) !important;
+        color: var(--white) !important;
+        box-shadow: 0 4px 12px rgba(18, 60, 105, 0.2);
+    }
+</style>
+{% endblock %}

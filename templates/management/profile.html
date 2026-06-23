@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - KCYM Pulluvazhy{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+
+    <div class="row g-5">
+        
+        <!-- Left Side: Profile Details and Edit Form -->
+        <div class="col-lg-7">
+            <div class="card-premium p-4 shadow-sm">
+                <h3 class="fw-bold mb-1 text-primary-dark"><i class="bi bi-person-gear text-primary"></i> Profile Settings</h3>
+                <p class="text-muted mb-4">View and update your personal details, donor status, and contact information.</p>
+                
+                <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                <p class="mb-0">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <!-- Profile Photo Selection -->
+                    <div class="d-flex align-items-center gap-4 mb-4 pb-3 border-bottom">
+                        <div class="profile-circle" style="width: 80px; height: 80px; font-size: 1.5rem; margin: 0; box-shadow: 0 4px 10px rgba(18,60,105,0.12); flex-shrink: 0;">
+                            {% if request.user.profile_image %}
+                                <img src="{{ request.user.profile_image.url }}" alt="{{ request.user.first_name }} {{ request.user.last_name }}">
+                            {% else %}
+                                {{ request.user.first_name|slice:":1" }}{{ request.user.last_name|slice:":1" }}
+                            {% endif %}
+                        </div>
+                        <div class="flex-grow-1">
+                            <label for="{{ form.profile_image.id_for_label }}" class="form-label fw-bold text-primary-dark mb-1">Update Profile Photo</label>
+                            {{ form.profile_image }}
+                            {% for error in form.profile_image.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group-premium mb-3">
+                            <label for="{{ form.first_name.id_for_label }}">First Name</label>
+                            {{ form.first_name }}
+                            {% for error in form.first_name.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6 form-group-premium mb-3">
+                            <label for="{{ form.last_name.id_for_label }}">Last Name</label>
+                            {{ form.last_name }}
+                            {% for error in form.last_name.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group-premium mb-3">
+                            <label for="{{ form.phone_number.id_for_label }}">Phone Number</label>
+                            {{ form.phone_number }}
+                            {% for error in form.phone_number.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6 form-group-premium mb-3">
+                            <label for="{{ form.email.id_for_label }}">Email Address</label>
+                            {{ form.email }}
+                            {% for error in form.email.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group-premium mb-3">
+                            <label for="{{ form.gender.id_for_label }}">Gender</label>
+                            {{ form.gender }}
+                            {% for error in form.gender.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6 form-group-premium mb-3">
+                            <label for="{{ form.date_of_birth.id_for_label }}">Date of Birth</label>
+                            {{ form.date_of_birth }}
+                            {% for error in form.date_of_birth.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="form-group-premium mb-3">
+                        <label for="{{ form.blood_group.id_for_label }}">Blood Group</label>
+                        {{ form.blood_group }}
+                        {% for error in form.blood_group.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Donor Settings Group -->
+                    <div class="p-3 rounded-3 mb-4" style="background-color: rgba(18, 60, 105, 0.03);">
+                        <h5 class="fw-bold mb-3 text-primary-dark"><i class="bi bi-droplet-half text-danger"></i> Blood Donor Availability</h5>
+                        
+                        <div class="form-check form-switch mb-3">
+                            {{ form.is_active_donor }}
+                            <label class="form-check-label fw-semibold" for="{{ form.is_active_donor.id_for_label }}">
+                                I am available to donate blood in case of emergencies.
+                            </label>
+                        </div>
+                        
+                        <div class="form-group-premium">
+                            <label for="{{ form.last_donation_date.id_for_label }}">Last Blood Donation Date</label>
+                            {{ form.last_donation_date }}
+                            {% for error in form.last_donation_date.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                            <small class="text-muted" style="font-size: 0.75rem;">Leave empty if you have not donated recently.</small>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary-custom w-100 py-2.5 rounded-3 fw-bold">
+                        Save Changes
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Right Side: RSVPs History -->
+        <div class="col-lg-5">
+            <div class="card-premium p-4 shadow-sm h-100">
+                <h4 class="fw-bold mb-4 text-primary-dark"><i class="bi bi-clock-history text-warning"></i> My Event RSVPs</h4>
+                
+                {% if rsvps %}
+                    <div class="d-flex flex-column gap-3">
+                        {% for rsvp in rsvps %}
+                            <div class="p-3 rounded-3 d-flex justify-content-between align-items-center" style="background-color: rgba(18, 60, 105, 0.02); border: 1px solid rgba(0,0,0,0.03);">
+                                <div>
+                                    <h6 class="fw-bold text-primary-dark mb-1">{{ rsvp.event.title }}</h6>
+                                    <small class="text-muted"><i class="bi bi-calendar"></i> {{ rsvp.event.date_and_time|date:"M d, Y" }}</small>
+                                </div>
+                                <div>
+                                    {% if rsvp.status == 'GOING' %}
+                                        <span class="badge bg-success badge-custom">Going</span>
+                                    {% elif rsvp.status == 'MAYBE' %}
+                                        <span class="badge bg-warning text-dark badge-custom">Maybe</span>
+                                    {% else %}
+                                        <span class="badge bg-danger badge-custom">Not Going</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5 text-muted">
+                        <i class="bi bi-calendar2-x display-6 mb-2"></i>
+                        <p class="mb-0">You haven't RSVP'd to any events yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

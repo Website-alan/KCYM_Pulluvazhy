@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Members Directory - KCYM Pulluvazhy{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-5 border-bottom pb-3">
+        <div>
+            <h1 class="fw-bold mb-1">Members Directory</h1>
+            <p class="text-muted mb-0">Browse and manage all registered members of KCYM Pulluvazhy.</p>
+        </div>
+        <div>
+            <a href="{% url 'member_add' %}" class="btn btn-primary-custom d-flex align-items-center gap-1">
+                <i class="bi bi-person-plus-fill"></i> Add New Member
+            </a>
+        </div>
+    </div>
+
+    <!-- Members Table -->
+    <div class="card-premium p-4 border-0">
+        {% if members %}
+            <div class="table-responsive table-responsive-custom">
+                <table class="table table-custom align-middle">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Username</th>
+                            <th>Role</th>
+                            <th>Contact</th>
+                            <th>Blood Group</th>
+                            <th>Active Donor</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for member in members %}
+                            <tr>
+                                <td>
+                                    <div class="fw-bold text-primary-dark">{{ member.first_name }} {{ member.last_name }}</div>
+                                    <small class="text-muted">Member since {{ member.join_date|date:"Y" }}</small>
+                                </td>
+                                <td><code>{{ member.username }}</code></td>
+                                <td>
+                                    {% if member.role == 'VICAR' %}
+                                        <span class="badge badge-custom bg-light text-primary border border-primary">Vicar</span>
+                                    {% elif member.role == 'ASSISTANT_VICAR' %}
+                                        <span class="badge badge-custom bg-light text-primary border border-primary">Assist Vicar</span>
+                                    {% elif member.role == 'EXECUTIVE' %}
+                                        <span class="badge badge-custom badge-executive">Executive</span>
+                                    {% else %}
+                                        <span class="badge badge-custom badge-member">Member</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <p class="mb-1 small"><strong>Phone:</strong> {{ member.phone_number }}</p>
+                                    <p class="mb-0 small text-muted"><strong>Email:</strong> {{ member.email }}</p>
+                                </td>
+                                <td>
+                                    <span class="badge bg-danger fs-6 px-3 py-1.5 fw-bold">{{ member.blood_group }}</span>
+                                </td>
+                                <td>
+                                    {% if member.is_active_donor %}
+                                        <span class="badge bg-success badge-custom"><i class="bi bi-check-circle-fill"></i> Yes</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary badge-custom"><i class="bi bi-dash-circle-fill"></i> No</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <a href="{% url 'member_edit' member.pk %}" class="btn btn-outline-primary btn-sm rounded-3">
+                                            <i class="bi bi-pencil"></i> Edit
+                                        </a>
+                                        <a href="{% url 'member_delete' member.pk %}" class="btn btn-outline-danger btn-sm rounded-3">
+                                            <i class="bi bi-trash"></i> Delete
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-people display-4 mb-3"></i>
+                <h5 class="fw-bold">No Members Found</h5>
+                <p class="mb-0">There are no approved members registered in the database yet.</p>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

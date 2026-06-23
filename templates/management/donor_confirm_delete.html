@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}Remove Donor - KCYM Pulluvazhy{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card-premium p-4 border-danger shadow-sm text-center">
+                <div class="stat-icon stat-icon-red mx-auto mb-4" style="width: 60px; height: 60px;">
+                    <i class="bi bi-heartbreak-fill text-danger fs-3"></i>
+                </div>
+                <h3 class="fw-bold text-danger mb-3">Remove Donor from Directory?</h3>
+                <p class="text-muted">
+                    Are you sure you want to remove <strong>{{ object.first_name }} {{ object.last_name }}</strong> ({{ object.blood_group }}) from the blood donors list?
+                    {% if object.member %}
+                    <br><span class="text-warning fw-bold">Note: This donor is linked to a KCYM member. Removing them from the donor list will deactivate their active donor status, but their membership will not be deleted.</span>
+                    {% else %}
+                    <br><span class="text-danger fw-bold">Note: This is an external donor. Removing them will permanently delete their record from the registry.</span>
+                    {% endif %}
+                </p>
+                
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
+                    <div class="d-flex gap-3">
+                        <button type="submit" class="btn btn-danger py-2.5 rounded-3 fw-bold flex-grow-1">Remove Donor</button>
+                        <a href="{% url 'blood_search' %}" class="btn btn-outline-secondary py-2.5 rounded-3 fw-bold flex-grow-1">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

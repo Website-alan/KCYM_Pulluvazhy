@@ -1,0 +1,313 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome - KCYM Pulluvazhy{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container text-center py-5">
+        <h1 class="display-4 fw-bold">St. Thomas Church, Pulluvazhy</h1>
+        <p class="lead">Kerala Catholic Youth Movement (KCYM) Management Application</p>
+        {% if not user.is_authenticated %}
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{% url 'register' %}" class="btn btn-secondary-custom btn-lg px-4">Register as Member</a>
+                <a href="{% url 'login' %}" class="btn btn-outline-light btn-lg px-4">Member Login</a>
+            </div>
+        {% elif user.role == 'PENDING' %}
+            <div class="alert alert-warning d-inline-block px-4 py-3 shadow-sm border-0" style="border-radius: 12px;">
+                <i class="bi bi-clock-history me-2"></i> Your registration request is pending Executive approval.
+            </div>
+        {% else %}
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{% url 'event_timeline' %}" class="btn btn-secondary-custom px-4">View Upcoming Events</a>
+                <a href="{% url 'blood_search' %}" class="btn btn-outline-light px-4">Search Blood Donors</a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Stats & Cards Grid -->
+<div class="container mt-n4" style="margin-top: -30px; position: relative; z-index: 10;">
+    <div class="row g-4 justify-content-center">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-blue">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ total_members_count }}</div>
+                    <div class="stat-label">Active Members</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-gold">
+                    <i class="bi bi-droplet-fill"></i>
+                </div>
+                <div>
+                    <div class="stat-number">{{ active_donors_count }}</div>
+                    <div class="stat-label">Active Donors</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card-premium h-100 p-3 d-flex align-items-center justify-content-between flex-row">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="stat-icon stat-icon-red">
+                        <i class="bi bi-heart-pulse-fill"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0 fw-bold">Emergency?</h6>
+                        <small class="text-muted">Need blood donor immediately?</small>
+                    </div>
+                </div>
+                <a href="{% url 'blood_request_add' %}" class="btn btn-danger btn-sm rounded-3 px-3 fw-bold">Request Now</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if leaders %}
+<div class="container mt-5">
+    <div class="leaders-section">
+        <h3 class="fw-bold text-center"><i class="bi bi-people-fill text-primary"></i> Church & KCYM Leadership</h3>
+        <div class="ticker-wrap">
+            <div class="ticker-track">
+                {% for leader in leaders %}
+                    <div class="ticker-item">
+                        <div class="profile-circle">
+                            {% if leader.profile_image %}
+                                <img src="{{ leader.profile_image.url }}" alt="{{ leader.first_name }} {{ leader.last_name }}">
+                            {% else %}
+                                {{ leader.first_name|slice:":1" }}{{ leader.last_name|slice:":1" }}
+                            {% endif %}
+                        </div>
+                        <div class="leader-name text-truncate w-100">{{ leader.first_name }} {{ leader.last_name }}</div>
+                        <div class="leader-role text-truncate w-100">
+                            {{ leader.role_label }}
+                        </div>
+                    </div>
+                {% endfor %}
+                <!-- Duplicate list for seamless infinite loop scroll -->
+                {% for leader in leaders %}
+                    <div class="ticker-item">
+                        <div class="profile-circle">
+                            {% if leader.profile_image %}
+                                <img src="{{ leader.profile_image.url }}" alt="{{ leader.first_name }} {{ leader.last_name }}">
+                            {% else %}
+                                {{ leader.first_name|slice:":1" }}{{ leader.last_name|slice:":1" }}
+                            {% endif %}
+                        </div>
+                        <div class="leader-name text-truncate w-100">{{ leader.first_name }} {{ leader.last_name }}</div>
+                        <div class="leader-role text-truncate w-100">
+                            {{ leader.role_label }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if clergy_list or active_committee_members %}
+<div class="container mt-5">
+    <div class="card-premium p-4 border-0">
+        <h3 class="fw-bold text-center mb-1 text-primary-dark"><i class="bi bi-person-rolodex text-primary"></i> Connect with Our Leaders</h3>
+        <p class="text-center text-muted mb-4">Directly get in touch with our committee office bearers and parish clergy.</p>
+        
+        <div class="row g-4 justify-content-center">
+            <!-- Clergy Section -->
+            {% for clergy in clergy_list %}
+                <div class="col-md-6 col-lg-3">
+                    <div class="d-flex flex-column align-items-center p-3 rounded-4 border bg-light h-100 text-center shadow-sm hover-translate-card" style="transition: all 0.2s ease;">
+                        <div class="profile-circle mb-3" style="width: 75px; height: 75px; font-size: 1.3rem; border-width: 3px; border-color: var(--primary-light); margin: 0 auto;">
+                            {% if clergy.profile_image %}
+                                <img src="{{ clergy.profile_image.url }}" alt="{{ clergy.first_name }} {{ clergy.last_name }}">
+                            {% else %}
+                                {{ clergy.first_name|slice:":1" }}{{ clergy.last_name|slice:":1" }}
+                            {% endif %}
+                        </div>
+                        <h6 class="fw-bold text-primary-dark mb-1">{{ clergy.first_name }} {{ clergy.last_name }}</h6>
+                        <span class="badge bg-light text-primary border border-primary mb-3" style="font-size: 0.75rem;">{{ clergy.get_role_display }}</span>
+                        
+                        <div class="mt-auto w-100">
+                            <a href="tel:{{ clergy.phone_number }}" class="btn btn-outline-primary btn-sm w-100 rounded-3 mb-2 fw-semibold">
+                                <i class="bi bi-telephone-fill me-1"></i> Call: {{ clergy.phone_number }}
+                            </a>
+                            <a href="mailto:{{ clergy.email }}" class="btn btn-link btn-sm text-decoration-none text-muted p-0 w-100 text-truncate" style="font-size: 0.75rem;">
+                                <i class="bi bi-envelope-fill me-1"></i> {{ clergy.email }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+            <!-- Committee Section -->
+            {% for cm in active_committee_members %}
+                <div class="col-md-6 col-lg-3">
+                    <div class="d-flex flex-column align-items-center p-3 rounded-4 border bg-light h-100 text-center shadow-sm hover-translate-card" style="transition: all 0.2s ease;">
+                        <div class="profile-circle mb-3" style="width: 75px; height: 75px; font-size: 1.3rem; border-width: 3px; border-color: var(--secondary-color); margin: 0 auto;">
+                            {% if cm.member.profile_image %}
+                                <img src="{{ cm.member.profile_image.url }}" alt="{{ cm.member.first_name }} {{ cm.member.last_name }}">
+                            {% else %}
+                                {{ cm.member.first_name|slice:":1" }}{{ cm.member.last_name|slice:":1" }}
+                            {% endif %}
+                        </div>
+                        <h6 class="fw-bold text-primary-dark mb-1">{{ cm.member.first_name }} {{ cm.member.last_name }}</h6>
+                        
+                        <span class="badge mb-3 {% if cm.position == 'PRESIDENT' or cm.position == 'SECRETARY' %}bg-warning text-dark{% else %}bg-primary text-white{% endif %}" style="font-size: 0.75rem;">
+                            {{ cm.get_position_display }}
+                        </span>
+                        
+                        <div class="mt-auto w-100">
+                            <a href="tel:{{ cm.member.phone_number }}" class="btn btn-outline-primary btn-sm w-100 rounded-3 mb-2 fw-semibold">
+                                <i class="bi bi-telephone-fill me-1"></i> Call: {{ cm.member.phone_number }}
+                            </a>
+                            <a href="mailto:{{ cm.member.email }}" class="btn btn-link btn-sm text-decoration-none text-muted p-0 w-100 text-truncate" style="font-size: 0.75rem;">
+                                <i class="bi bi-envelope-fill me-1"></i> {{ cm.member.email }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-translate-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(18, 60, 105, 0.1) !important;
+        border-color: var(--primary-light) !important;
+    }
+</style>
+{% endif %}
+
+<div class="container mt-4">
+    <div class="row g-5">
+        
+        <!-- Left Side: Announcements & Notices -->
+        <div class="col-lg-7">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="mb-0 fw-bold"><i class="bi bi-megaphone-fill text-primary"></i> Announcements</h3>
+                {% if user.is_authenticated and user.is_executive %}
+                    <a href="{% url 'announcement_add' %}" class="btn btn-primary-custom btn-sm">
+                        <i class="bi bi-plus-lg"></i> Post Announcement
+                    </a>
+                {% endif %}
+            </div>
+
+            {% if announcements %}
+                <div class="d-flex flex-column gap-4">
+                    {% for announcement in announcements %}
+                        <div class="card-premium p-4 position-relative {% if announcement.is_pinned %}border-start border-warning border-4{% endif %}">
+                            {% if announcement.is_pinned %}
+                                <span class="position-absolute top-0 end-0 bg-warning text-dark px-3 py-1 rounded-bl-lg small fw-bold" style="border-radius: 0 16px 0 16px; font-size: 0.7rem;">
+                                    <i class="bi bi-pin-angle-fill"></i> PINNED
+                                </span>
+                            {% endif %}
+                            <h5 class="fw-bold mb-2">{{ announcement.title }}</h5>
+                            <p class="text-muted mb-3" style="font-size: 0.95rem;">{{ announcement.content|linebreaksbr }}</p>
+                            <div class="d-flex justify-content-between align-items-center mt-2 border-top pt-2">
+                                <small class="text-muted"><i class="bi bi-clock"></i> Posted on {{ announcement.date_posted|date:"M d, Y g:i A" }}</small>
+                                {% if user.is_authenticated and user.is_executive %}
+                                    <div class="d-flex gap-2">
+                                        <a href="{% url 'announcement_edit' announcement.pk %}" class="btn btn-outline-primary btn-sm px-2 py-1" style="font-size: 0.8rem;">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="{% url 'announcement_delete' announcement.pk %}" class="btn btn-outline-danger btn-sm px-2 py-1" style="font-size: 0.8rem;">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="card-premium p-5 text-center text-muted">
+                    <i class="bi bi-journal-x display-6 mb-3"></i>
+                    <p class="mb-0">No announcements posted yet.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Right Side: Events & Blood Requests -->
+        <div class="col-lg-5">
+            <!-- Blood Requests Board -->
+            <div class="mb-5">
+                <h3 class="mb-4 fw-bold"><i class="bi bi-heart-fill text-danger"></i> Urgent Blood Requests</h3>
+                {% if blood_requests %}
+                    <div class="d-flex flex-column gap-3">
+                        {% for req in blood_requests %}
+                            <div class="card-premium border-danger p-3" style="border-left: 4px solid var(--danger-color) !important;">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h5 class="fw-bold text-danger mb-0">{{ req.blood_group }} Required</h5>
+                                    <span class="badge bg-danger rounded-pill">Urgent</span>
+                                </div>
+                                <p class="mb-2"><strong>Patient:</strong> {{ req.patient_name }}</p>
+                                <p class="mb-2"><strong>Hospital:</strong> {{ req.hospital }}</p>
+                                <p class="mb-2"><strong>Needed By:</strong> {{ req.needed_by|date:"M d, Y" }}</p>
+                                {% if req.details %}
+                                    <p class="text-muted small mb-2">{{ req.details }}</p>
+                                {% endif %}
+                                <div class="d-flex justify-content-between align-items-center mt-3 border-top pt-2">
+                                    <a href="tel:{{ req.contact_number }}" class="btn btn-outline-danger btn-sm fw-bold">
+                                        <i class="bi bi-telephone"></i> Call: {{ req.contact_number }}
+                                    </a>
+                                    {% if user.is_authenticated and not user.role == 'PENDING' %}
+                                        <form method="post" action="{% url 'blood_request_fulfill' req.pk %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-success btn-sm">Mark Arranged</button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="card-premium p-4 text-center text-muted">
+                        <i class="bi bi-check-circle display-6 text-success mb-2"></i>
+                        <p class="mb-0">All blood requests are currently fulfilled.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Upcoming Events Summary -->
+            <div>
+                <h3 class="mb-4 fw-bold"><i class="bi bi-calendar-check-fill text-warning"></i> Upcoming Events</h3>
+                {% if upcoming_events %}
+                    <div class="d-flex flex-column gap-3">
+                        {% for event in upcoming_events %}
+                            <div class="card-premium p-3">
+                                <h6 class="fw-bold mb-1">{{ event.title }}</h6>
+                                <p class="text-muted small mb-2"><i class="bi bi-geo-alt"></i> {{ event.location }}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-primary small fw-semibold">
+                                        <i class="bi bi-clock"></i> {{ event.date_and_time|date:"M d, Y g:i A" }}
+                                    </span>
+                                    {% if event.is_public %}
+                                        <span class="badge bg-success" style="font-size: 0.65rem;">Public</span>
+                                    {% else %}
+                                        <span class="badge bg-primary" style="font-size: 0.65rem;">Members Only</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                        <a href="{% url 'event_timeline' %}" class="btn btn-outline-primary btn-sm w-100 py-2 mt-2 rounded-3">View Full Timeline</a>
+                    </div>
+                {% else %}
+                    <div class="card-premium p-4 text-center text-muted">
+                        <i class="bi bi-calendar-x display-6 mb-2"></i>
+                        <p class="mb-0">No upcoming events listed.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}
