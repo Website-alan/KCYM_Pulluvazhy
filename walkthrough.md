@@ -134,3 +134,52 @@ Destroying test database for alias 'default'...
    - Go to `http://127.0.0.1:8000/blood-search/` to filter members by blood group, click "Add External Donor" to add a non-member donor, or edit/delete existing donors.
    - Access `http://127.0.0.1:8000/events/` to post events and RSVP to them.
 
+---
+
+## Deployment to Render & Neon (Online Public Site)
+
+Follow these steps to deploy your application online:
+
+### Step 1: Create a GitHub Repository & Push Code
+1. Log in to your [GitHub Account](https://github.com/).
+2. Create a new repository named `KCYM_Pulluvazhy` (set it to **Private** to keep your application code and config private).
+3. Open a PowerShell terminal in your project directory (`c:\Users\alanb\Desktop\Projects\KCYM_Pulluvazhy`) and run the following commands to link and push your code:
+   ```powershell
+   git branch -M main
+   git remote add origin https://github.com/YOUR_GITHUB_USERNAME/KCYM_Pulluvazhy.git
+   git push -u origin main
+   ```
+   *(Be sure to replace `YOUR_GITHUB_USERNAME` with your actual GitHub username).*
+
+### Step 2: Set Up a Neon PostgreSQL Database
+1. Go to [Neon.tech](https://neon.tech/) and sign up for a free account.
+2. Create a new project. Neon will automatically spin up a PostgreSQL database and provide you with a **Connection String** (which starts with `postgresql://...`).
+3. Copy this database connection string. You will need it for the next step.
+
+### Step 3: Create Render Web Service
+1. Go to [Render.com](https://render.com/) and sign up / log in.
+2. Click **New +** and select **Web Service**.
+3. Connect your GitHub account and select your `KCYM_Pulluvazhy` repository.
+4. Configure the Web Service settings:
+   * **Name**: `kcym-pulluvazhy` (or any name you prefer).
+   * **Region**: Choose the region closest to you.
+   * **Branch**: `main`
+   * **Runtime**: `Python 3`
+   * **Build Command**: `./build.sh` (or `sh build.sh` if it complains about execute permissions)
+   * **Start Command**: `gunicorn kcym_project.wsgi`
+   * **Instance Type**: Select the **Free** tier.
+
+### Step 4: Add Environment Variables on Render
+Inside your Render Web Service dashboard, navigate to the **Environment** tab and add the following variables:
+1. `DATABASE_URL`: Paste the PostgreSQL connection string you copied from Neon.
+2. `SECRET_KEY`: Generate a random secure string (e.g., `PulluvazhyKCYM@2026!AdminKey`).
+3. `DEBUG`: `False` (for production security).
+4. `ALLOWED_HOSTS`: `kcym-pulluvazhy.onrender.com` (replace with your actual Render subdomain).
+5. `CSRF_TRUSTED_ORIGINS`: `https://kcym-pulluvazhy.onrender.com` (replace with your actual Render URL).
+
+### Step 5: Deploy & Launch!
+1. Click **Deploy Web Service**.
+2. Render will automatically run `build.sh` (which installs dependencies, collects static files, and executes migrations automatically on Neon PostgreSQL).
+3. Once the build log says "Live", click the Render URL at the top left of the dashboard (e.g., `https://kcym-pulluvazhy.onrender.com/`).
+4. **Done!** Your site is now live on the internet! All members and the public can now access it securely!
+
