@@ -83,7 +83,14 @@ WSGI_APPLICATION = 'kcym_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-if env.str('DATABASE_URL', default=''):
+if 'test' in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+elif env.str('DATABASE_URL', default=''):
     DATABASES = {
         'default': env.db('DATABASE_URL')
     }
