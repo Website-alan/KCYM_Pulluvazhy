@@ -1,0 +1,15 @@
+Django>=5.0,<6.0
+django-bootstrap-v5>=1.0.11
+django-environ>=0.13.0
+django-import-export>=3.3.6
+django-jazzmin>=3.0.4
+djangorestframework>=3.17.1
+django-cors-headers>=4.9.0
+pillow>=10.0.0
+whitenoise>=6.6.0
+gunicorn>=21.0.0
+psycopg2-binary>=2.9.0
+asgiref>=3.7.0
+tzdata>=2023.3
+tzlocal>=5.0
+sqlparse>=0.4.0
